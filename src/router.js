@@ -21,6 +21,7 @@ export default Router.extend({
 
     routes: {
         '': 'public',
+        'public': 'public',
         'repos': 'repos'
     },
 
