@@ -1,5 +1,4 @@
 import app from 'ampersand-app';
-import styles from './styles/main.styl';
 import qs from 'qs';
 import xhr from 'xhr';
 import React from 'react';
