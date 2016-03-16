@@ -6,25 +6,64 @@ export default React.createClass({
 
     displayName: 'Label',
 
-    onClickEdit() {
+    getInitialState() {
+        const {name, color} = this.props.label;
+        return {name, color};
+    },
+
+    onNameChange(e) {
+        this.setState({
+            name: e.target.value
+        });
+    },
+
+    onColorChange(e) {
+        this.setState({
+            color: e.target.value.slice(1)
+        });
+    },
+
+    onClickDelete(e) {
+        e.preventDefault();
+        this.props.label.destroy();
+    },
+
+    onClickEdit(e) {
+        e.preventDefault();
         this.props.label.editing = true;
     },
 
-    onClickCancel() {
+    onClickCancel(e) {
+        e.preventDefault();
         this.props.label.editing = false;
+        this.setState(this.getInitialState());
+    },
+
+    onSubmit(e) {
+        e.preventDefault();
+        const {label} = this.props;
+
+        if (label.saved) {
+            label.update(this.state);
+        } else {
+            label.save(this.state)
+        }
+
+        label.editing = false;
     },
 
     render() {
         const {label} = this.props;
-        const cssColor = '#' + label.color;
+        const {name, color} = this.state;
+        const cssColor = '#' + color;
         let content;
 
         if (label.editing) {
             content = (
-                <form className='label'>
-                    <span className='label-color avatar avatar-small avatar-rounded'>&nbsp;</span>
-                    <input name='name'/>
-                    <input name='color'/>
+                <form onSubmit={this.onSubmit} className='label'>
+                    <span style={{backgroundColor: cssColor}} className='label-color avatar avatar-small avatar-rounded'>&nbsp;</span>
+                    <input name='name' onChange={this.onNameChange} value={name}/>
+                    <input name='color' onChange={this.onColorChange}  value={cssColor}/>
                     <button type='submit' className='button button-small'>Save</button>
                     <button onClick={this.onClickCancel} type='button' className='button button-small button-unstyled'>cancel</button>
                 </form>
@@ -32,10 +71,10 @@ export default React.createClass({
         } else {
             content = (
                 <div className='label'>
-                    <span className='label-color' style={{backgroundColor: cssColor}}>&nbsp;</span>
-                    <span>{label.name}</span>
+                    <span style={{backgroundColor: cssColor}} className='label-color'>&nbsp;</span>
+                    <span>{name}</span>
                     <span onClick={this.onClickEdit} className='octicon octicon-pencil'></span>
-                    <span className='octicon octicon-x'></span>
+                    <span onClick={this.onClickDelete} className='octicon octicon-x'></span>
                 </div>
             );
         }
