@@ -7,6 +7,17 @@ import PublicPage from './pages/public';
 import Layout from './layout';
 import ReposPage from './pages/repos';
 import RepoDetail from './pages/repo-detail';
+import MessagePage from './pages/message-page';
+
+function requiresAuth(handlerName) {
+    return function() {
+        if (app.me.token) {
+            this[handlerName].apply(this, arguments);
+        } else {
+            this.redirectTo('/');
+        }
+    }
+}
 
 export default Router.extend({
     renderPage(page, opts = {layout: true}) {
@@ -26,9 +37,10 @@ export default Router.extend({
         'public': 'public',
         'login': 'login',
         'logout': 'logout',
-        'repos': 'repos',
-        'repo/:owner/:name': 'repoDetail',
-        'auth/callback?:query': 'authCallback'
+        'repos': requiresAuth('repos'),
+        'repo/:owner/:name': requiresAuth('repoDetail'),
+        'auth/callback?:query': 'authCallback',
+        '*fourOhFour': 'fourOhFour'
     },
 
     public() {
@@ -63,10 +75,16 @@ export default Router.extend({
             app.me.token = body.token;
             this.redirectTo('/repos');
         });
+
+        this.renderPage(<MessagePage title='Fetching your data'/>);
     },
 
     logout() {
         window.localStorage.clear();
         window.location = '/';
+    },
+
+    fourOhFour() {
+        this.renderPage(<MessagePage title='Not Found' body='Sorry, nothing here.' />);
     }
 });

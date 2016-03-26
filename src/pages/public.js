@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 import NavHelper from '../components/navhelper';
 
 export default React.createClass({
